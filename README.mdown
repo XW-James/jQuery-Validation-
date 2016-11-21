@@ -1,0 +1,180 @@
+http://www.cnblogs.com/hejunrex/archive/2011/11/17/2252193.html
+
+method
+rule   (method and elem)
+
+validate 核心方法
+
+
+# valid() , rules:
+根据元素获取校验规则
+$("#form").valid()?"correct":"error";   //valid()方法：检查表单或某些元素是否有效，返回值为boolean型，
+
+rules只针对表单里的元素，而不是某个整个表单(会抛出错误)
+1.可以使用rules("add",{})的方法来为元素添加规则，如:
+$("#username").rules("add",{minlength:2,maxlength:10})
+2.可以使用rules("remove",{})的方法来为元素去掉规则，如：
+$("#username").rules("remove","email")
+3.可以使用rules（）无参数的方法来获取规则
+valid()方法
+检查表单或者某些元素是否有错误
+$("#form").valid();返回值为布尔型；
+
+
+# validate方法返回 validator对象
+1、Validator.form()：验证表单是否有效，返回true/false；
+2、Validator.element(element)：验证某个元素是否有效，返回true/false；
+如：validator.element("#username")
+3、Validator.resetForm()：把表单恢复到验证前原来的状态，会清除显示的验证错误信息
+4、Validator.showErrors(errors)：针对某个元素显示特定的错误信息
+如：Validator.showErrors({username:"xxxxxx",passworld:"xxxxx"})，新的错误信息会立即显示
+5、Validator.numberOfInvailds()：返回无效(即没通过验证的)的元素数量
+
+
+# Validator对象的 静态方法：
+1、jQuery.validator.addMethod(name,method[,message])：增加自定义的验证方法
+2、jQuery.validator.format(template,argument,argumentN...)：格式化字符串，用参数代替模板中的{n}
+如：var template=$.validator.format("{0}-{1}-{2}");
+template("你","我","他")或template(["你","我","他"])则输出"你-我-他"，参数个数不够则会输出{n}来代替
+3、jQuery.validator.setDefaults(options)：修改插件默认设置
+如：$.validator.setDefaults({debug:true});表示给所有的表单都设置
+4、jQuery.validator.addClassRules(name,rules)：为某些class属性值包含name的元素增加验证规则
+如：$.validator.addClassRules({text:{required:true,minlength:5}});表示给class="text"的元素添加验证规则
+
+
+
+#validate()方法配置项一：
+--submitHandler:通过验证后运行的函数，可以加上表单的提交方法
+    submitHandler:function(form){
+//提交表单或者其他的操作都可以,参数form是表单的document对象
+form.submit();//提交表单，$(form).submit();//不能提交成功  $(form).serialize()
+}
+--invalidHandler:无效表单提交后运行的函数
+如：invalidHandler:function(event,validator){
+//event:无效验证触发的事件 
+//validator:对象
+}
+也可以写事件来触发invalidHandler的event事件，如：
+$("#form").on("invalid-form",function(event,validator){
+})
+--ignore:对某些元素不进行验证
+	ignore:"#username"//代表对username选择器的不再进行校验
+	当省略ignore时和ignore:":hidden"一样，对隐藏的元素不进行校验
+--rules:定义校验规则
+	rules中的校验方法都可以定义depends属性，表示当条件满足时返回true，则执行校验方法
+	针对参数为boolean类型的校验方法：
+	required:{
+		//只有depends:function(element)返回true，required校验方法才起作用
+		depends:function(element){
+		//:filled是Validation自带的选择器，匹配填写内容的元素
+		return $("#password").is(":filled")
+		}
+	}
+	针对参数为非boolean类型的校验方法如下：
+	maxlength:{
+		param:2
+		//只有depends:function(element)返回true，maxlength校验方法的值才设置为2
+		depends:function(element){
+		//:filled是Validation自带的选择器，匹配填写内容的元素
+		return $("#password").is(":filled")
+		}
+	}
+	}
+
+--messages:定义提示信息
+--groups:对一组元素的验证，用一个错误提示，用errorPlacement控制把错误信息放在哪里
+groups的使用如下：
+	groups:{login:"username password confirm-password"} //对一组元素进行验证
+	errorPlacement:function(error,element){ //对一组元素验证后错误信息显示
+	error.insertBefore("#info");//将一组元素的错误信息都显示在id="info"的元素上
+	}
+
+
+validate()方法配置项 三
+onsubmit:是否在提交时验证，默认值为true
+
+onfoucusout:是否在获取焦时验证
+
+onkeyup:是否在敲击键盘时验证
+
+onclick:是否在鼠标点击时验证，一般用于checkbox或者radio
+
+focusInvalid:提交表单后，未通过验证的表单（第一个或提交之前获得焦点的未通过验证的 表单）是否会获得焦点
+
+focusCleanup:当未通过验证的元素获得焦点时，是否移除错误提示
+
+errorClass:指定错误提示的css类名，可以自定义错误提示的样式
+
+validClass:指定验证通过的css类名
+
+errorElement:使用什么标签标记错误
+
+wrapper：使用什么标签把上边的errorElement包起来
+
+errorLaberContainer:把错误信息统一放在一个容器里面
+
+errorContainer:显示或者隐藏验证信息，可以自动实现有错误信息出现时把容器属性变为显示，无错误时隐藏。
+
+
+
+validate()方法配置项之四：
+1、showErrors：可以显示总共有多少个未通过验证的元素
+如：showErrors:function(errorMap,errorList){
+errorMap：元素信息和错误信息的键值对
+errorList：元素信息、错误信息、验证方法等信息列表
+this.defaultShowErrors();//使用默认的错误提示信息展示方式，需要这个否则错误信息不显示了
+}
+2、errorPlacement：自定义错误信息放在哪里，配合groups一起使用
+3、success：要验证的元素通过验证后的动作
+如：success:"right" 或 success:function(label){label.addClass("right")}
+效果是给错误信息展示label元素的class属性值追加right值
+4、highlight：可以给未通过验证的元素加效果
+如：highlight:function(element,errorClass,validClass){
+//element：绑定验证的元素
+//errorClass：验证错误信息展示label的class属性值
+//validClass：验证通过信息展示label的class属性值
+}
+5、unhighlight：去除未通过验证的元素的效果，一般和highlight同时使用，同上
+
+注意：success主要针对label元素，highlight主要针对input元素
+     highlight和unhighlight主要用在单项验证时
+
+
+自定义验证方法
+$.validator.addMethod(name,method，[message])
+name:验证方法名称，
+method:function(value(验证元素的值),element(被验证的元素),params(验证方法的值)方法逻辑
+message:提示消息
+
+//自定义验证
+$.validator.addMethod("name",function(value,element,params){
+    var name=规则
+    return this.optional(element)||(name.test(value));
+),"请填写正确的XXX");
+
+
+代码解释：
+this.optional(element)：元素填写值才会触发的该验证方法，没值不验证
+postcode.test(value)：对元素的值进行正则表达式判断，符合正则表达式返回true
+
+additional-methods.js包含了很多扩展验证方法。在写自定义方法时可以参考这个js库
+
+$.extend($.validator.message,{
+	require:"这是必填字段",
+	range:$.validator.format("请输入范围在{0}和{1}之间的值")
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
