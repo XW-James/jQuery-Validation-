@@ -10,6 +10,10 @@ validate 核心方法
 根据元素获取校验规则
 $("#form").valid()?"correct":"error";   //valid()方法：检查表单或某些元素是否有效，返回值为boolean型，
 
+remote:{
+	
+}
+
 rules只针对表单里的元素，而不是某个整个表单(会抛出错误)
 1.可以使用rules("add",{})的方法来为元素添加规则，如:
 $("#username").rules("add",{minlength:2,maxlength:10})
@@ -138,6 +142,11 @@ this.defaultShowErrors();//使用默认的错误提示信息展示方式，需�
 
 注意：success主要针对label元素，highlight主要针对input元素
      highlight和unhighlight主要用在单项验证时
+
+
+1、:blank   选择所有值为空的元素，会自动去除半角的空格，全角的空格则不为空
+2、:filled  选择所有值不为空的元素 会自动去除半角的空格，全角的空格则不为空
+3、:unchecked  选择所有没有被选中的元素
 
 
 自定义验证方法
